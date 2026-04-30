@@ -522,10 +522,19 @@
         </div>
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-px ink-bg border hairline-strong anim-fadeup" style={{ animationDelay: "0.4s" }}>
-          {[["90+ days", "Industry average"], ["3 days", "ArtChain median"], ["$50B", "Market · zero rails"], ["8 screens", "End-to-end demo"]].map(([k, v], i) => (
-            <div key={i} className="cream p-8">
-              <div className="ff-display text-[40px] leading-none">{k}</div>
-              <div className="text-[12px] mt-3 muted">{v}</div>
+          {[
+            ["90+ days", "Industry average", WORKS[0]],
+            ["3 days", "ArtChain median", WORKS[1]],
+            ["$50B", "Market · zero rails", WORKS[2]],
+            ["8 screens", "End-to-end demo", WORKS[3]],
+          ].map(([k, v, work], i) => (
+            <div key={i} className="cream relative overflow-hidden">
+              <ArtworkImage work={work} className="absolute inset-0 opacity-30" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6EC] via-[#FAF6EC]/85 to-[#FAF6EC]/55" />
+              <div className="relative p-8">
+                <div className="ff-display text-[40px] leading-none">{k}</div>
+                <div className="text-[12px] mt-3 muted">{v}</div>
+              </div>
             </div>
           ))}
         </div>
