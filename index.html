@@ -122,7 +122,7 @@
      ════════════════════════════════════════════════════════════════════ */
   const WORKS = [
     { id: "comp-14", title: "Composition No. 14", year: 1949,
-      medium: "Oil and enamel on linen", catalog: "PE·1949·014",
+      medium: "Oil and enamel on linen", catalog: "PE-1949-014",
       dimensions: "84 × 132 in", inv: "INV-PE-44291",
       img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1400&q=85",
       palette: ["#1F0E08", "#C97A2D", "#8B2218", "#E6D2A8"],
@@ -133,7 +133,7 @@
       exhibitions: ["MoMA, 2018", "Tate Modern, 2021", "Gagosian, 2023"],
       lastDeal: { buyer: "Hermès", fee: 42000, date: "Mar 2026" } },
     { id: "study-7", title: "Study for Untitled VII", year: 1951,
-      medium: "Enamel on paper", catalog: "PE·1951·007",
+      medium: "Enamel on paper", catalog: "PE-1951-007",
       dimensions: "22 × 30 in", inv: "INV-PE-44312",
       img: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=1400&q=85",
       palette: ["#0F1A2E", "#2B5C8C", "#B8A076", "#F2E8D2"],
@@ -144,7 +144,7 @@
       exhibitions: ["Whitney, 2019", "Hauser & Wirth, 2022"],
       lastDeal: null },
     { id: "drift-3", title: "Drift, No. 3", year: 1948,
-      medium: "Enamel and aluminum paint on canvas", catalog: "PE·1948·003",
+      medium: "Enamel and aluminum paint on canvas", catalog: "PE-1948-003",
       dimensions: "60 × 96 in", inv: "INV-PE-44188",
       img: "https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=1400&q=85",
       palette: ["#1A1208", "#C28A3A", "#7A3018", "#E8DAB8"],
@@ -154,8 +154,8 @@
       feeRange: [40000, 95000],
       exhibitions: ["Guggenheim, 2017", "MoMA, 2019", "Pompidou, 2022", "Tate, 2024"],
       lastDeal: { buyer: "Phaidon", fee: 88000, date: "Nov 2025" } },
-    { id: "field-22", title: "Field Notation, 22", year: 1950,
-      medium: "Mixed media on board", catalog: "PE·1950·022",
+    { id: "field-22", title: "Field Notation, 22", year: 1959,
+      medium: "Mixed media on board", catalog: "PE-1959-022",
       dimensions: "48 × 60 in", inv: "INV-PE-44256",
       img: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1400&q=85",
       palette: ["#2A1810", "#C48538", "#8C2A1F", "#E6CFA0"],
@@ -514,9 +514,9 @@
         {/* Hero visual band — palette swatches from real catalog works */}
         <div className="mt-12 grid grid-cols-4 gap-3 anim-fadeup" style={{ animationDelay: "0.25s" }}>
           {WORKS.map((w, i) => (
-            <div key={w.id} className="aspect-[5/4] border hairline relative overflow-hidden group">
-              <ArtworkImage work={w} className="absolute inset-0" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            <div key={w.id} className="aspect-[5/4] border hairline relative overflow-hidden group transition-colors duration-300 hover:border-[#161616]/45">
+              <ArtworkImage work={w} className="absolute inset-0 scale-100 group-hover:scale-[1.04] transition-transform duration-500 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/15 to-transparent group-hover:from-black/55 transition-all duration-300" />
               <div className="absolute bottom-2 left-2 right-2 text-white">
                 <div className="ff-mono text-[9px] tracking-widest uppercase opacity-80">{w.catalog}</div>
                 <div className="ff-display text-[13px] leading-tight italic mt-0.5">{w.title}</div>
@@ -1467,6 +1467,9 @@
   function BuyerVaultScreen({ work, request, onRestart }) {
     const [units, setUnits] = useState(847);
     const [retailPrice, setRetailPrice] = useState(420);
+    const [activeFileFilter, setActiveFileFilter] = useState("All");
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [demoMessage, setDemoMessage] = useState("");
 
     const grossRetail = units * retailPrice;
     const royaltyOwed = Math.round(grossRetail * 0.04);
@@ -1480,6 +1483,18 @@
       { m: "M9", v: 128 }, { m: "M10", v: 138 }, { m: "M11", v: 148 }, { m: "M12", v: 156 },
     ];
     const projectedYearRevenue = 156 * 25 * retailPrice;
+    const fileLibrary = [
+      { name: "Master TIFF", category: "Source Assets", desc: "Production-grade · 16bit", size: "184 MB", ext: "TIFF", icon: <ImageIcon size={14} />, type: "TIFF", description: "Production-grade 16-bit master image prepared for licensed manufacturing.", usage: "High-resolution textile print, premium packaging, or exhibition-quality reproduction." },
+      { name: "Vector outlines", category: "Source Assets", desc: "Scalable · multi-color", size: "6 MB", ext: "SVG", icon: <Layers size={14} />, type: "SVG", description: "Scalable outline layer for engraving, embroidery, product layout, and die-line adaptation.", usage: "Apparel embroidery, leather goods engraving, or packaging layout." },
+      { name: "Color profiles", category: "Production Files", desc: "ICC · Pantone matched", size: "1 MB", ext: "ICC", icon: <Layers size={14} />, type: "ICC", description: "Matched color profiles for print vendors to reduce production color drift.", usage: "Textile printing, packaging proofing, and physical sample validation." },
+      { name: "Mockup library", category: "Production Files", desc: "Scarves · prints · packaging", size: "84 MB", ext: "PSD", icon: <Briefcase size={14} />, type: "PSD", description: "Product mockups showing approved placement on packaging, scarf, poster, and retail display formats.", usage: "Buyer approval, retail planning, and investor preview." },
+      { name: "Brand kit", category: "Brand & Marketing", desc: "Usage rules · approved palettes", size: "12 MB", ext: "PDF", icon: <FileText size={14} />, type: "PDF", description: "Approved color, typography, spacing, and co-branding rules for the licensed collaboration.", usage: "Ensures Vogue, estate, and product teams use the artwork consistently across campaigns." },
+      { name: "Watermarked previews", category: "Brand & Marketing", desc: "Marketing & social", size: "32 MB", ext: "PNG", icon: <Eye size={14} />, type: "PNG", description: "Safe preview images for marketing review before full-resolution files are released.", usage: "Internal approval decks, campaign planning, and social preview." },
+      { name: "Tech specs", category: "Legal & Technical", desc: "Reproduction guidelines", size: "3 MB", ext: "PDF", icon: <FileText size={14} />, type: "PDF", description: "Reproduction guidelines, resolution requirements, approved dimensions, and vendor constraints.", usage: "Helps manufacturers know what can and cannot be changed." },
+      { name: "License copy", category: "Legal & Technical", desc: "Counter-signed contract", size: "2 MB", ext: "PDF", icon: <FileCheck size={14} />, type: "PDF", description: "Counter-signed license contract with territory, duration, product category, royalty, and usage restrictions.", usage: "Legal and finance teams verify the license terms before release." },
+    ];
+    const categories = ["All", "Source Assets", "Production Files", "Brand & Marketing", "Legal & Technical"];
+    const visibleFiles = fileLibrary.filter((f) => activeFileFilter === "All" || f.category === activeFileFilter);
 
     return (
       <section className="max-w-[1400px] mx-auto px-8 pt-12 pb-24">
@@ -1517,34 +1532,62 @@
               <Download size={12} /> Download all (412MB)
             </button>
           </div>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {categories.map((category) => (
+              <button key={category} onClick={() => setActiveFileFilter(category)}
+                className={"px-3 py-1.5 text-[10px] ff-mono tracking-[0.16em] uppercase border transition " + (activeFileFilter === category ? "ink-bg text-white border-[#161616]" : "paper border hairline hover:border-[#161616]/45")}>
+                {category}
+              </button>
+            ))}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[
-              { name: "Master TIFF",       desc: "Production-grade · 16bit",       size: "184 MB", ext: "TIFF", icon: <ImageIcon size={14} /> },
-              { name: "Vector outlines",   desc: "Scalable · multi-color",          size: "6 MB",   ext: "SVG",  icon: <Layers size={14} /> },
-              { name: "Brand kit",         desc: "Usage rules · approved palettes", size: "12 MB",  ext: "PDF",  icon: <FileText size={14} /> },
-              { name: "Mockup library",    desc: "Scarves · prints · packaging",    size: "84 MB",  ext: "PSD",  icon: <Briefcase size={14} /> },
-              { name: "Watermarked previews", desc: "Marketing & social",            size: "32 MB",  ext: "PNG",  icon: <Eye size={14} /> },
-              { name: "Color profiles",    desc: "ICC · Pantone matched",           size: "1 MB",   ext: "ICC",  icon: <Layers size={14} /> },
-              { name: "Tech specs",        desc: "Reproduction guidelines",         size: "3 MB",   ext: "PDF",  icon: <FileText size={14} /> },
-              { name: "License copy",      desc: "Counter-signed contract",         size: "2 MB",   ext: "PDF",  icon: <FileCheck size={14} /> },
-            ].map((f, i) => (
-              <div key={i} className="paper border hairline p-4 group hover:border-[#161616]/50 transition cursor-pointer">
+            {visibleFiles.map((f, i) => (
+              <button key={i} onClick={() => setSelectedFile(f)} className="paper border hairline p-4 group hover:border-[#161616]/50 transition cursor-pointer text-left">
                 <div className="flex items-start justify-between">
                   <div className="w-9 h-9 cream border hairline flex items-center justify-center">{f.icon}</div>
                   <span className="text-[9px] ff-mono tracking-widest uppercase muted">{f.ext}</span>
                 </div>
                 <div className="ff-display text-[16px] mt-3 leading-tight">{f.name}</div>
                 <div className="text-[11px] muted mt-1">{f.desc}</div>
+                <div className="text-[9px] ff-mono uppercase tracking-widest mt-2 ox">{f.category}</div>
                 <div className="mt-3 pt-3 border-t hairline flex items-center justify-between text-[10px] ff-mono tracking-wider uppercase">
                   <span className="muted">{f.size}</span>
                   <span className="ink flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    <Download size={11} /> Download
+                    <Eye size={11} /> Preview
                   </span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
+          <div className="mt-4 text-[10px] ff-mono tracking-[0.14em] uppercase muted">Demo preview only · Access controlled by license ID · Logged on-chain</div>
+          {demoMessage && <div className="mt-3 text-[11px] ox">{demoMessage}</div>}
         </div>
+        {selectedFile && (
+          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6" onClick={() => setSelectedFile(null)}>
+            <div className="paper border hairline-strong w-full max-w-[780px] p-6 md:p-8 relative" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => setSelectedFile(null)} className="absolute right-4 top-4 border hairline p-1.5"><X size={14} /></button>
+              <div className="text-[10px] ff-mono tracking-[0.18em] uppercase muted">Demo preview only</div>
+              <h4 className="ff-display text-[32px] leading-[1.05] mt-2">{selectedFile.name}</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-[11px]">
+                <div><div className="ff-mono uppercase muted text-[9px]">Category</div><div>{selectedFile.category}</div></div>
+                <div><div className="ff-mono uppercase muted text-[9px]">File type</div><div>{selectedFile.type}</div></div>
+                <div><div className="ff-mono uppercase muted text-[9px]">File size</div><div>{selectedFile.size}</div></div>
+                <div><div className="ff-mono uppercase muted text-[9px]">Status</div><div className="leaf">Logged on-chain</div></div>
+              </div>
+              <p className="mt-5 text-[14px] muted">{selectedFile.description}</p>
+              <p className="mt-2 text-[13px]"><span className="ff-mono uppercase text-[10px] muted">Example usage:</span> {selectedFile.usage}</p>
+              <div className="mt-5 border hairline bg-gradient-to-br from-[#efe7d7] to-[#e5dac5] p-6 h-[140px] flex items-end justify-between">
+                <span className="ff-mono text-[10px] tracking-widest uppercase">{selectedFile.ext} sample · license VC-0042</span>
+                <span className="text-[10px] ff-mono uppercase muted">Access controlled by license ID</span>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <button onClick={() => setDemoMessage("Sample file access recorded for demo.")} className="ink-bg text-white px-4 py-2 text-[10px] ff-mono tracking-[0.16em] uppercase">Open example</button>
+                <button onClick={() => setDemoMessage("Sample file access recorded for demo.")} className="border hairline-strong px-4 py-2 text-[10px] ff-mono tracking-[0.16em] uppercase">Download sample</button>
+                <button onClick={() => setSelectedFile(null)} className="border hairline px-4 py-2 text-[10px] ff-mono tracking-[0.16em] uppercase">Close</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-px ink-bg border hairline-strong anim-fadeup" style={{ animationDelay: "0.2s" }}>
           <div className="lg:col-span-5 cream p-6">
