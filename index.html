@@ -212,11 +212,20 @@
      Bulletproof artwork image — fallback to elegant catalog plate if URL fails
      ════════════════════════════════════════════════════════════════════ */
   function ArtworkImage({ work, className = "", overlay = null }) {
-    // Always render the generative SVG plate — guaranteed beautiful, offline-capable, on-brand
+    const [imgFailed, setImgFailed] = useState(false);
     const grad = "linear-gradient(135deg, " + work.palette[3] + " 0%, " + work.palette[2] + " 50%, " + work.palette[0] + " 100%)";
     return (
       <div className={"relative overflow-hidden " + className} style={{ background: grad }}>
-        <FallbackPlate work={work} />
+        {!imgFailed && (
+          <img
+            src={work.img}
+            alt={work.title}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            onError={() => setImgFailed(true)}
+          />
+        )}
+        {imgFailed && <FallbackPlate work={work} />}
         {overlay}
       </div>
     );
