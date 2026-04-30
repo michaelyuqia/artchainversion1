@@ -125,8 +125,8 @@
       medium: "Oil and enamel on linen", catalog: "PE-1949-014",
       dimensions: "84 × 132 in", inv: "INV-PE-44291",
       img: [
-        "https://upload.wikimedia.org/wikipedia/commons/5/5f/Jackson_Pollock%2C_1948%2C_Number_1A%2C_1948.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/3/3a/Jackson_Pollock%2C_Mural%2C_1943.jpg"
+        "https://picsum.photos/id/1025/1800/1200",
+        "https://picsum.photos/id/1035/1800/1200"
       ],
       palette: ["#1F0E08", "#C97A2D", "#8B2218", "#E6D2A8"],
       rights: { available: ["Editorial", "Commercial — Limited", "Documentary"], licensed: ["Apparel — Capsule (LVMH, EU·2025-2027)"] },
@@ -139,8 +139,8 @@
       medium: "Enamel on paper", catalog: "PE-1951-007",
       dimensions: "22 × 30 in", inv: "INV-PE-44312",
       img: [
-        "https://upload.wikimedia.org/wikipedia/commons/0/0a/No._5%2C_1948.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/8/8a/Jackson_Pollock%2C_Blue_poles.jpg"
+        "https://picsum.photos/id/1040/1800/1200",
+        "https://picsum.photos/id/1067/1800/1200"
       ],
       palette: ["#0F1A2E", "#2B5C8C", "#B8A076", "#F2E8D2"],
       rights: { available: ["Editorial", "Documentary"], licensed: [] },
@@ -153,8 +153,8 @@
       medium: "Enamel and aluminum paint on canvas", catalog: "PE-1948-003",
       dimensions: "60 × 96 in", inv: "INV-PE-44188",
       img: [
-        "https://upload.wikimedia.org/wikipedia/en/5/55/No._5%2C_1948.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/8/85/Jackson_Pollock%2C_The_She-Wolf%2C_1943.jpg"
+        "https://picsum.photos/id/1074/1800/1200",
+        "https://picsum.photos/id/1080/1800/1200"
       ],
       palette: ["#1A1208", "#C28A3A", "#7A3018", "#E8DAB8"],
       rights: { available: ["Editorial", "Commercial — Limited"], licensed: ["Documentary (A24, Worldwide·2024-2026)"] },
@@ -167,8 +167,8 @@
       medium: "Mixed media on board", catalog: "PE-1959-022",
       dimensions: "48 × 60 in", inv: "INV-PE-44256",
       img: [
-        "https://upload.wikimedia.org/wikipedia/commons/c/c2/Jackson_Pollock%2C_Convergence%2C_1952.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/1/14/Jackson_Pollock_31.jpg"
+        "https://picsum.photos/id/1081/1800/1200",
+        "https://picsum.photos/id/1082/1800/1200"
       ],
       palette: ["#2A1810", "#C48538", "#8C2A1F", "#E6CFA0"],
       rights: { available: ["Editorial", "Commercial — Limited", "Apparel"], licensed: [] },
@@ -223,7 +223,7 @@
   /* ════════════════════════════════════════════════════════════════════
      Bulletproof artwork image — fallback to elegant catalog plate if URL fails
      ════════════════════════════════════════════════════════════════════ */
-  function ArtworkImage({ work, className = "", overlay = null }) {
+  function ArtworkImage({ work, className = "", overlay = null, eager = false }) {
     const sources = Array.isArray(work.img) ? work.img : [work.img];
     const [srcIdx, setSrcIdx] = useState(0);
     const [imgFailed, setImgFailed] = useState(false);
@@ -243,7 +243,7 @@
             src={src}
             alt={work.title}
             className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
+            loading={eager ? "eager" : "lazy"}
             referrerPolicy="no-referrer"
             onError={handleError}
           />
@@ -435,7 +435,7 @@
       <div className="ff-body cream ink min-h-screen relative grain">
         <TopBar step={step} phase={phase} goto={goto} />
         <main className="relative pb-32">
-          {phase.id === "intro"    && <IntroScreen onBegin={next} />}
+          {phase.id === "intro"    && <IntroScreen onBegin={next} heroWork={WORKS[0]} />}
           {phase.id === "catalog"  && <CatalogScreen works={WORKS} onSelect={(w) => { setSelectedWork(w); next(); }} />}
           {phase.id === "request"  && <RequestScreen work={selectedWork} request={request} setRequest={setRequest} onSubmit={next} />}
           {phase.id === "platform" && <PlatformScreen onContinue={next} />}
@@ -519,7 +519,7 @@
   /* ════════════════════════════════════════════════════════════════════
      01 · Intro
      ════════════════════════════════════════════════════════════════════ */
-  function IntroScreen({ onBegin }) {
+  function IntroScreen({ onBegin, heroWork }) {
     return (
       <section className="max-w-[1400px] mx-auto px-8 pt-16 pb-24">
         <div className="flex items-center gap-3 text-[11px] ff-mono tracking-[0.2em] uppercase muted anim-fade">
@@ -533,6 +533,9 @@
           ArtChain compresses it to a single transaction surface — verified, certified, royalty-tracked, and permanently auditable for both sides.
           In the demo ahead, you'll watch a deal close between Vogue Collections and the Pollock Estate.
         </p>
+        <div className="mt-10 anim-fadeup border hairline overflow-hidden" style={{ animationDelay: "0.22s" }}>
+          <ArtworkImage work={heroWork} eager={true} className="aspect-[16/6]" />
+        </div>
 
         {/* Hero visual band — palette swatches from real catalog works */}
         <div className="mt-12 grid grid-cols-4 gap-3 anim-fadeup" style={{ animationDelay: "0.25s" }}>
@@ -718,6 +721,7 @@
                 className={span + " group text-left anim-fadeup"}
                 style={{ animationDelay: (0.15 + i * 0.08) + "s" }}>
                 <ArtworkImage work={w}
+                  eager={i === 0}
                   className={"border hairline " + (tall ? "aspect-[4/5]" : "aspect-[5/4]")}
                   overlay={
                     <>
