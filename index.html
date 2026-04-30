@@ -124,7 +124,10 @@
     { id: "comp-14", title: "Composition No. 14", year: 1949,
       medium: "Oil and enamel on linen", catalog: "PE-1949-014",
       dimensions: "84 × 132 in", inv: "INV-PE-44291",
-      img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1400&q=85",
+      img: [
+        "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=1400&q=85",
+        "https://picsum.photos/id/1025/1400/1750"
+      ],
       palette: ["#1F0E08", "#C97A2D", "#8B2218", "#E6D2A8"],
       rights: { available: ["Editorial", "Commercial — Limited", "Documentary"], licensed: ["Apparel — Capsule (LVMH, EU·2025-2027)"] },
       provenance: "Estate archives · 4 verified prior exhibitions",
@@ -135,7 +138,10 @@
     { id: "study-7", title: "Study for Untitled VII", year: 1951,
       medium: "Enamel on paper", catalog: "PE-1951-007",
       dimensions: "22 × 30 in", inv: "INV-PE-44312",
-      img: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=1400&q=85",
+      img: [
+        "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1400&q=85",
+        "https://picsum.photos/id/1060/1400/1750"
+      ],
       palette: ["#0F1A2E", "#2B5C8C", "#B8A076", "#F2E8D2"],
       rights: { available: ["Editorial", "Documentary"], licensed: [] },
       provenance: "Estate archives · 2 verified prior exhibitions",
@@ -146,7 +152,10 @@
     { id: "drift-3", title: "Drift, No. 3", year: 1948,
       medium: "Enamel and aluminum paint on canvas", catalog: "PE-1948-003",
       dimensions: "60 × 96 in", inv: "INV-PE-44188",
-      img: "https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=1400&q=85",
+      img: [
+        "https://images.unsplash.com/photo-1578926288207-a90a5366759d?auto=format&fit=crop&w=1400&q=85",
+        "https://picsum.photos/id/1018/1400/1750"
+      ],
       palette: ["#1A1208", "#C28A3A", "#7A3018", "#E8DAB8"],
       rights: { available: ["Editorial", "Commercial — Limited"], licensed: ["Documentary (A24, Worldwide·2024-2026)"] },
       provenance: "Estate archives · 6 verified prior exhibitions",
@@ -157,7 +166,10 @@
     { id: "field-22", title: "Field Notation, 22", year: 1959,
       medium: "Mixed media on board", catalog: "PE-1959-022",
       dimensions: "48 × 60 in", inv: "INV-PE-44256",
-      img: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1400&q=85",
+      img: [
+        "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?auto=format&fit=crop&w=1400&q=85",
+        "https://picsum.photos/id/1039/1400/1750"
+      ],
       palette: ["#2A1810", "#C48538", "#8C2A1F", "#E6CFA0"],
       rights: { available: ["Editorial", "Commercial — Limited", "Apparel"], licensed: [] },
       provenance: "Estate archives · 3 verified prior exhibitions",
@@ -212,17 +224,28 @@
      Bulletproof artwork image — fallback to elegant catalog plate if URL fails
      ════════════════════════════════════════════════════════════════════ */
   function ArtworkImage({ work, className = "", overlay = null }) {
+    const sources = Array.isArray(work.img) ? work.img : [work.img];
+    const [srcIdx, setSrcIdx] = useState(0);
     const [imgFailed, setImgFailed] = useState(false);
     const grad = "linear-gradient(135deg, " + work.palette[3] + " 0%, " + work.palette[2] + " 50%, " + work.palette[0] + " 100%)";
+    const src = sources[Math.min(srcIdx, sources.length - 1)];
+    const handleError = () => {
+      if (srcIdx < sources.length - 1) {
+        setSrcIdx(srcIdx + 1);
+      } else {
+        setImgFailed(true);
+      }
+    };
     return (
       <div className={"relative overflow-hidden " + className} style={{ background: grad }}>
         {!imgFailed && (
           <img
-            src={work.img}
+            src={src}
             alt={work.title}
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
-            onError={() => setImgFailed(true)}
+            referrerPolicy="no-referrer"
+            onError={handleError}
           />
         )}
         {imgFailed && <FallbackPlate work={work} />}
